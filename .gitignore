@@ -1,0 +1,6 @@
+.DS_Store
+.idea
+node_modules
+.vscode
+**/.DS_Store
+stats.json

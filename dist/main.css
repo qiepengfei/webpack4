@@ -1,0 +1,9 @@
+body {
+  background: green;
+  /* comment*/ }
+  body div {
+    color: red;
+    width: 300px;
+    height: 300px;
+    border: 1px solid black; }
+
