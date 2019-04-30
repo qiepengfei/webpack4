@@ -1,6 +1,17 @@
-import '../../css/homepage.scss';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './css/index.scss';
+import NavBottom from '../aaaCommon/bottomNav/Index.jsx';
+import { navConfig } from './configs/config.js';
 
-console.log('hello world!!')
+ReactDOM.render(
+    <NavBottom navConfig={navConfig} />,
+    document.getElementById('container'),
+    () => {
+        // window.jmEvaluation && window.jmEvaluation.init('FW_GOODS-585051');
+    }
+);
+
 
 
 

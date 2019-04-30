@@ -1,0 +1,54 @@
+/* @import "../mixin";*/
+.msz-nav {
+  width: 100%;
+  background: #fff;
+  text-align: center;
+  height: 1.12rem;
+  line-height: 1.12rem; }
+  .msz-nav h2 {
+    font-size: 18px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-wrap: break-word;
+    white-space: nowrap;
+    padding: 0 1rem; }
+    .msz-nav h2 a {
+      color: #333333; }
+  .msz-nav .nav-left {
+    position: absolute;
+    left: 0.4rem;
+    top: 0;
+    color: #666;
+    font-size: 16px; }
+  .msz-nav .nav-right {
+    font-size: 16px;
+    position: absolute;
+    top: 0;
+    right: 0.4rem;
+    color: #666; }
+  .msz-nav .nav-right > a {
+    background-repeat: no-repeat;
+    background-size: 0.48rem;
+    display: inline-block;
+    width: 0.50rem;
+    height: 0.50rem;
+    vertical-align: top; }
+
+[data-dpr="2"] .msz-nav h2 {
+  font-size: 36px; }
+
+[data-dpr="2"] .msz-nav .nav-left {
+  font-size: 32px; }
+
+[data-dpr="2"] .msz-nav .nav-right {
+  font-size: 32px; }
+
+[data-dpr="3"] .msz-nav h2 {
+  font-size: 54px; }
+
+[data-dpr="3"] .msz-nav .nav-left {
+  font-size: 32px; }
+
+[data-dpr="3"] .msz-nav .nav-right {
+  font-size: 32px; }
+

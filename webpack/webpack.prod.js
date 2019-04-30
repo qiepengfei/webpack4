@@ -1,24 +1,38 @@
+const os = require('os');
 const path = require('./path-variables');
 const autoprefixer = require('autoprefixer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const HappyPack = require('happypack');
+
+// 根据系统的内核数量指定线程池个数
+const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
 
 module.exports = {
-	mode: 'none',
-    entry: './src/static/js/homepage/main.js',
+	mode: 'production',
+    entry: ['@babel/polyfill', './src/static/js/homepage/main.js'],
     output: {
-        filename: 'dist/static/js/bundle.js',
-        path: path.DIST_PATH 
+        filename: 'static/js/bundle.js',
+        chunkFilename: 'static/js/[name].js',
+        path: path.DIST_PATH ,
+        publicPath: '/'
     },
     module: {
         rules: [
+            // js和jsx
+            {
+                test: /\.(js|jsx)$/,
+                loader: 'happypack/loader',
+                exclude: /node_modules/,
+                // include: [`${path.STATIC_PATH}/js`, `${path.STATIC_PATH}/sw.js`]
+            },
             // css和scss
             {
                 test: /\.(css|scss)$/,
                 use: [
-                	MiniCssExtractPlugin.loader,
+                    MiniCssExtractPlugin.loader,
                     'css-loader',
                     'sass-loader',
                     {
@@ -34,7 +48,52 @@ module.exports = {
                     }
                 ]
             },
+            // img
+            {
+                test: /\.(png|jpe?g|gif|ico|svg)$/i,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            fallback: 'file-loader',
+                            limit: 20480, // 20kb
+                            name: `static/img/[name].[ext]`
+                        }
+                    },
+                    {
+                        loader: 'image-webpack-loader',
+                        options: {
+                            disable: true // webpack@2.x and newer
+                        }
+                    }
+                ],
+                // include: [`${path.STATIC_PATH}/img`]
+            },
+            // font
+            {
+                test: /\.(woff|eot|ttf|svg)(\?(\w|#)+)?$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: 'static/css/fonts/[name].[ext]'
+                        }
+                    }
+                ],
+                // include: [`${path.STATIC_PATH}/css/fonts`]
+            }
         ],
+    },
+    resolve: {
+        extensions: ['.js', '.jsx'],
+        mainFields: ['jsnext:main', 'browser', 'main'], // 优先采用的第三方模块的语法
+        alias: {
+            css: `${path.STATIC_PATH}/css`,
+            util: `${path.STATIC_PATH}/js/util/main.js`,
+            widget: `${path.STATIC_PATH}/js/widget`,
+            commonComponents: `${path.STATIC_PATH}/js/commonComponents`
+        }
+        // modules: [`${path.STATIC_PATH}/js`, 'node_modules'] 基本没影响
     },
     plugins: [
         new CleanWebpackPlugin('./dist/*', {
@@ -45,29 +104,37 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: 'src/views/index.html',
-		    minify: {
-		        removeComments: true,
-		        collapseWhitespace: true,
-		        removeAttributeQuotes: true
-		    }
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+                removeAttributeQuotes: true
+            },
+            chunksSortMode: 'dependency'
         }),
         // todo: 不能指定输入路径
-        new MiniCssExtractPlugin(),
+        new MiniCssExtractPlugin({
+            filename: 'static/css/[name].css"',
+            chunkFilename: 'static/css/[name].css'
+        }),
+        new HappyPack({
+            loaders: ['babel-loader?cacheDirectory'],
+            threadPool: happyThreadPool,
+            verbose: false
+        })
     ],
     optimization: {
         minimizer: [
-        	// todo：不起作用
-            new OptimizeCSSAssetsPlugin({
-                assetNameRegExp: /\.css$/g,
-                cssProcessorOptions: {
-                    safe: true,
-                    autoprefixer: { disable: true }, // 避免autoprefixer的前缀被移除
-                    discardComments: {
-                        removeAll: true // 移除注释
-                    }
-                },
-                canPrint: true
-            })    
+            // new OptimizeCSSAssetsPlugin({
+            //     assetNameRegExp: /\.css$/g,
+            //     cssProcessorOptions: {
+            //         safe: true,
+            //         autoprefixer: { disable: true }, // 避免autoprefixer的前缀被移除
+            //         discardComments: {
+            //             removeAll: true // 移除注释
+            //         }
+            //     },
+            //     canPrint: true
+            // })    
         ]
     }
 };
